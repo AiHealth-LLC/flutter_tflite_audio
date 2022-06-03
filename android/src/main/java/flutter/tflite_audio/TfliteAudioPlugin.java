@@ -626,6 +626,8 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
         float [][][][] inputData4D; // for spectro
         Object [] inputArray;
 
+        float[][][] inputDataTruncatePad; // ! for input to our model
+
         int [] outputShape = tfLite.getOutputTensor(0).shape();
         int outputSize = Arrays.stream(outputShape).max().getAsInt();
         float [][] outputTensor = new float [1][outputSize];
