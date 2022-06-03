@@ -595,19 +595,20 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
     // truncate or pad to (1,512,128) ; (batch, samples, nMFCC)
     private float [][][] truncPadding(float[][] array, int xx, int yy){
         int h = array.length;
-        Log.d("TruncPadding", "h " + h + ", should end with 512 samples (xx)");
+        Log.d("TruncPadding", "h " + h + ", should end with 128 nMFCC (xx)");
 
         int w = array[0].length;
-        Log.d("TruncPadding", "w " + w + ", should be 128 nMFCC (yy)");
+        Log.d("TruncPadding", "w " + w + ", should be 512 samples (yy)");
 
         float[][][] truncPadded = new float[1][512][128];
 
-        for (int i = 0; i < xx; i++) { // 512
-            for (int j = 0; j < yy; j++) { // 128
-                if (j >= h) { // for padding
-                    truncPadded[0][i][j] = 0;
+        for (int i = 0; i < xx; i++) { // xx=128
+            for (int j = 0; j < yy; j++) { // yy=512
+                // also transpose
+                if (j >= w) { // for padding
+                    truncPadded[0][j][i] = 0;
                 }else{
-                    truncPadded[0][i][j] = array[i][j];
+                    truncPadded[0][j][i] = array[i][j];
                 }
             }
         }
@@ -658,7 +659,10 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
                 //     ? signalProcessing.transpose2D(mfcc)
                 //     : mfcc;
 
-                inputDataTruncatePad = truncPadding(mfcc, 512, 128);
+                Log.d("TruncPadding", "mfcc.len=" + mfcc.length);
+                Log.d("TruncPadding", "mfcc[0].len=" + mfcc[0].length);
+
+                inputDataTruncatePad = truncPadding(mfcc, 128, 512);
 
                 tfLite.run(inputDataTruncatePad, outputTensor);
                 break;
