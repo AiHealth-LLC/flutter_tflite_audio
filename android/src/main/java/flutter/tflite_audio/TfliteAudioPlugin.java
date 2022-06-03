@@ -649,7 +649,7 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
                     ? signalProcessing.transpose2D(mfcc)
                     : mfcc;
 
-                inputDataTruncatePad = truncPadding(inputData2D);
+                inputDataTruncatePad = truncPadding(inputData2D, 128, 512);
 
                 tfLite.run(inputData2D, outputTensor);
                 break;
