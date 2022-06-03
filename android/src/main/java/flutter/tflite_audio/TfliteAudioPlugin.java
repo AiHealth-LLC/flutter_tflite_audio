@@ -592,19 +592,19 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
         recording.start();
     }
 
-    // truncate or pad AFTER transpose2D
+    // truncate or pad to (1,512,128) ; (batch, samples, nMFCC)
     private float [][][] truncPadding(float[][] array, int xx, int yy){
         int h = array.length;
-        Log.d("TruncPadding", "h " + h + ", should be 128 (xx)");
+        Log.d("TruncPadding", "h " + h + ", should end with 512 samples (xx)");
 
         int w = array[0].length;
-        Log.d("TruncPadding", "w " + w + ", should be 512 (yy) (after truncating or padding)");
+        Log.d("TruncPadding", "w " + w + ", should be 128 nMFCC (yy)");
 
-        float[][][] truncPadded = new float[1][128][512];
+        float[][][] truncPadded = new float[1][512][128];
 
-        for (int i = 0; i < xx; i++) {
-            for (int j = 0; j < yy; j++) {
-                if (j >= w){
+        for (int i = 0; i < xx; i++) { // 512
+            for (int j = 0; j < yy; j++) { // 128
+                if (j >= h) { // for padding
                     truncPadded[0][i][j] = 0;
                 }else{
                     truncPadded[0][i][j] = array[i][j];
@@ -613,8 +613,8 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
         }
 
         Log.d("TruncPadding", "new b " + truncPadded.length + ", should be 1 (batch)");
-        Log.d("TruncPadding", "new h " + truncPadded[0].length + ", should be 128 (xx)");
-        Log.d("TruncPadding", "new w " + truncPadded[0][0].length + ", should be 512 (yy) (after truncating or padding)");
+        Log.d("TruncPadding", "new h " + truncPadded[0].length + ", should be 512 (xx)");
+        Log.d("TruncPadding", "new w " + truncPadded[0][0].length + ", should be 128 (yy)");
 
         return truncPadded;
          
@@ -654,11 +654,11 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
                 inputBuffer32 = audioData.normalizeBySigned16(inputBuffer16);
                 float[][] mfcc = signalProcessing.getMFCC(inputBuffer32);
 
-                inputData2D = transposeSpectro
-                    ? signalProcessing.transpose2D(mfcc)
-                    : mfcc;
+                // inputData2D = transposeSpectro
+                //     ? signalProcessing.transpose2D(mfcc)
+                //     : mfcc;
 
-                inputDataTruncatePad = truncPadding(inputData2D, 128, 512);
+                inputDataTruncatePad = truncPadding(mfcc, 512, 128);
 
                 tfLite.run(inputDataTruncatePad, outputTensor);
                 break;
