@@ -592,6 +592,25 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
         recording.start();
     }
 
+    private float [][][] truncPadding(float[][] array, int xx, int yy){
+        int h = array.length;
+        Log.d("TruncPadding", "h " + h + ", should be 128");
+
+        int w = array[0].length;
+        Log.d("TruncPadding", "w " + w + ", should be 512 (after truncating)");
+
+        int a = (xx - h) / 2;
+        int aa = xx - a - h;
+
+        int b = (yy - w) / 2;
+        int bb = yy - b - w;
+
+        float[][][] truncPadded = new float[1][128][512];
+
+        return truncPadded;
+         
+    }
+
     private void startRecognition(short[] inputBuffer16) {
         Log.v(LOG_TAG, "Recognition started.");
 
@@ -627,6 +646,8 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
                 inputData2D = transposeSpectro
                     ? signalProcessing.transpose2D(mfcc)
                     : mfcc;
+
+                inputDataTruncatePad = truncPadding(inputData2D);
 
                 tfLite.run(inputData2D, outputTensor);
                 break;
