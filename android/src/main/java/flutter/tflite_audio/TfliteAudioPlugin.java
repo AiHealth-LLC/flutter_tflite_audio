@@ -612,11 +612,9 @@ public class TfliteAudioPlugin implements MethodCallHandler, StreamHandler, Flut
             }
         }
 
-        int h = array.length;
-        Log.d("TruncPadding", "new h " + truncPadded.length + ", should be 128 (xx)");
-
-        int w = array[0].length;
-        Log.d("TruncPadding", "new w " + truncPadded[0].length + ", should be 512 (yy) (after truncating or padding)");
+        Log.d("TruncPadding", "new b " + truncPadded.length + ", should be 1 (batch)");
+        Log.d("TruncPadding", "new h " + truncPadded[0].length + ", should be 128 (xx)");
+        Log.d("TruncPadding", "new w " + truncPadded[0][0].length + ", should be 512 (yy) (after truncating or padding)");
 
         return truncPadded;
          
