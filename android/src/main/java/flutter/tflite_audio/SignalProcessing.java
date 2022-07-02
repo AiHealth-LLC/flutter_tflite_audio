@@ -69,6 +69,22 @@ public class SignalProcessing{
 
     public float [][] getMFCC(float [] inputBuffer32){
         float [][] MFCC = jLibrosa.generateMFCCFeatures(inputBuffer32, sampleRate, nMFCC, nFFT, nMels, hopLength);
+
+        // SAVE MFCC
+        var mfccString = "";
+        for (int i=0; i < MFCC.length; i++){
+            for (int j=0; j<MFCC[0].length; j++){
+                mfccString += MFCC[i][j] + " ";
+            }
+        }
+        final Path path = Paths.get("mfcc.txt");
+        try (
+            final BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        ) {
+            writer.write(mfccString);
+            writer.flush();
+        }
+        // SAVE MFCC
         if (showPreprocessLogs) displayShape(MFCC);
         return MFCC;
     }

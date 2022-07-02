@@ -438,12 +438,25 @@ public class SwiftTfliteAudioPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
                 print(buffer64[0..<40])
 
                 let mfcc = buffer64.mfcc(nMFCC: nMFCC, nFFT: nFFT, hopLength: hopLength, sampleRate: sampleRate, melsCount: nMels)
+
+                // SAVE MFCC
+                var mfccString = ""
                 
-//                for i in 1..<mfcc.count{
-//                    for n in 1..<mfcc[0].count{
-//                        print(mfcc[i][n])
-//                    }
-//                }
+                for i in 1..<mfcc.count{
+                    for n in 1..<mfcc[0].count{
+                            mfccString += "\(mfcc[i][n]) "
+                        print(mfcc[i][n])
+                    }
+                    mfccString += "\n"
+                }
+
+                let path = FileManager.default.urls(for: .documentDirectory,
+                                                    in: .userDomainMask)[0].appendingPathComponent("mfcc.txt")
+                // SAVE MFCC
+
+                if let stringData = stringToSave.data(using: .utf8) {
+                    try? stringData.write(to: path)
+                }
                 
                 let flatMFCC = mfcc.reduce([], +)
                 let minMFCC: Double = flatMFCC.min()!
